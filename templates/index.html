@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistant with Particles</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background: transparent;
+      color: #f1f1f1;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+   #particles-js {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* fallback background */
+}
+    textarea {
+      width: 300px;
+      height: 60px;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: #2c3e50;
+      color: white;
+      font-size: 16px;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+      z-index: 1;
+      position: relative;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      z-index: 1;
+      position: relative;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #0072ff, #00c6ff);
+      transform: scale(1.05);
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    #output {
+      margin-top: 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #00ffcc;
+      text-shadow: 0 0 5px #00ffc3;
+      z-index: 1;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Particles background -->
+  <div id="particles-js"></div>
+
+  <h1>✨ My Assistant</h1>
+
+  <textarea id="textInput" placeholder="Type your command..."></textarea><br>
+  <button onclick="processText()">Submit</button>
+  <button onclick="startListening()">🎤 Speak</button>
+
+  <div class="button-group">
+    <button title="Say Hello or Hi" onclick="processCommand('hello')">👋 Greet</button>
+    <button title="Get the current time" onclick="processCommand('time')">⏰ Time</button>
+    <button title="Get today’s date" onclick="processCommand('date')">📅 Date</button>
+    <button title="Search Google" onclick="runSearch()">🔍 Search</button>
+    <button title="Search YouTube" onclick="runYouTube()">🎬 YouTube</button>
+    <button title="Summary (future)" onclick="processCommand('summary')">📄 Summary</button>
+    <button title="Talk" onclick="processCommand('talk')">💬 Talk</button>
+  </div>
+
+  <div id="output"></div>
+
+  <!-- Script Logic -->
+  <script>
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
+
+    function processCommand(command) {
+      command = command.toLowerCase();
+      let output = document.getElementById('output');
+
+      if (command.includes("hello") || command.includes("hi")) {
+        output.innerText = "Hi there!";
+        speak("Hi there!");
+      } else if (command.includes("time")) {
+        let time = new Date().toLocaleTimeString();
+        output.innerText = time;
+        speak("Current time is " + time);
+      } else if (command.includes("date")) {
+        let date = new Date().toLocaleDateString();
+        output.innerText = date;
+        speak("Today’s date is " + date);
+      } else if (command.includes("talk")) {
+        output.innerText = "I'm just code, but I'm doing great!";
+        speak("I'm just code, but I'm doing great!");
+      } else if (command.includes("summary")) {
+        output.innerText = "Summary feature is coming soon.";
+        speak("Summary feature is coming soon.");
+      } else {
+        output.innerText = "I didn’t understand: " + command;
+        speak("Sorry, I didn't understand that.");
+      }
+    }
+
+    function processText() {
+      const input = document.getElementById('textInput').value;
+      processCommand(input);
+    }
+
+    function startListening() {
+      const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.start();
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('textInput').value = transcript;
+        processCommand(transcript);
+      };
+      recognition.onerror = function(event) {
+        document.getElementById('output').innerText = "Error: " + event.error;
+        speak("There was an error.");
+      };
+    }
+
+    function runSearch() {
+      const query = document.getElementById('textInput').value.trim();
+      if (query) {
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank");
+        speak("Searching Google for " + query);
+      } else {
+        speak("Please type something to search.");
+      }
+    }
+
+    function runYouTube() {
+      const query = document.getElementById('textInput').value.trim();
+      if (query) {
+        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, "_blank");
+        speak("Searching YouTube for " + query);
+      } else {
+        speak("Please type something to search on YouTube.");
+      }
+    }
+  </script>
+
+  <!-- Load particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 80 },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.5 },
+        size: { value: 2 },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#ffffff",
+          opacity: 0.4,
+          width: 1
+        },
+        move: { enable: true, speed: 1 }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: { enable: true, mode: "grab" },
+          onclick: { enable: true, mode: "push" }
+        },
+        modes: {
+          grab: { distance: 140, line_linked: { opacity: 0.8 } },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
+  </script>
+</body>
+</html>
